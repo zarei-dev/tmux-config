@@ -38,10 +38,15 @@ fi
 
 # --- Install plugins ---
 echo "Installing plugins..."
+STARTED_SERVER=false
+if ! tmux list-sessions &>/dev/null; then
+    tmux new-session -d -s _setup
+    STARTED_SERVER=true
+fi
 "$TPM_DIR/bin/install_plugins"
-
-# --- Reload config if tmux server is running ---
-if tmux list-sessions &>/dev/null; then
+if [ "$STARTED_SERVER" = true ]; then
+    tmux kill-session -t _setup 2>/dev/null || true
+else
     tmux source-file "$TMUX_CONF"
     echo "Reloaded tmux config"
 fi
