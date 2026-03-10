@@ -43,9 +43,12 @@ if ! tmux list-sessions &>/dev/null; then
     tmux new-session -d -s _setup
     STARTED_SERVER=true
 fi
+# Ensure TMUX_PLUGIN_MANAGER_PATH is set in the server environment
+# (set-environment in .tmux.conf may not take effect without an active client)
+tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins/"
 "$TPM_DIR/bin/install_plugins"
 if [ "$STARTED_SERVER" = true ]; then
-    tmux kill-session -t _setup 2>/dev/null || true
+    tmux kill-server 2>/dev/null || true
 else
     tmux source-file "$TMUX_CONF"
     echo "Reloaded tmux config"
