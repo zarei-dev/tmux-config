@@ -67,6 +67,8 @@ else
     cat >> "$SHELL_RC" << 'RCEOF'
 
 # >>> tmux-auto-attach >>>
+# Remove any existing tmux alias so the function can be defined
+unalias tmux 2>/dev/null || true
 tmux() {
     if [ -n "${TMUX:-}" ]; then echo "Already inside tmux."; return 0; fi
     if [ $# -eq 0 ]; then
