@@ -4,8 +4,13 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 TMUX_CONF="$HOME/.tmux.conf"
-BASHRC="$HOME/.bashrc"
 SENTINEL="# >>> tmux-auto-attach >>>"
+
+# Detect user's shell rc file
+case "$(basename "${SHELL:-/bin/bash}")" in
+    zsh)  SHELL_RC="$HOME/.zshrc" ;;
+    *)    SHELL_RC="$HOME/.bashrc" ;;
+esac
 
 echo "==> tmux-config setup"
 
@@ -54,12 +59,12 @@ else
     echo "Reloaded tmux config"
 fi
 
-# --- Add auto-attach function to .bashrc ---
-if grep -qF "$SENTINEL" "$BASHRC" 2>/dev/null; then
-    echo "Auto-attach function already in $BASHRC"
+# --- Add auto-attach function to shell rc ---
+if grep -qF "$SENTINEL" "$SHELL_RC" 2>/dev/null; then
+    echo "Auto-attach function already in $SHELL_RC"
 else
-    echo "Adding auto-attach function to $BASHRC"
-    cat >> "$BASHRC" << 'BASHEOF'
+    echo "Adding auto-attach function to $SHELL_RC"
+    cat >> "$SHELL_RC" << 'RCEOF'
 
 # >>> tmux-auto-attach >>>
 tmux() {
@@ -71,7 +76,7 @@ tmux() {
     fi
 }
 # <<< tmux-auto-attach <<<
-BASHEOF
+RCEOF
 fi
 
-echo "==> Done! Run 'source ~/.bashrc' then type 'tmux' to start."
+echo "==> Done! Run 'source $SHELL_RC' then type 'tmux' to start."
